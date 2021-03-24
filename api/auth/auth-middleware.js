@@ -16,6 +16,20 @@ const restricted = (req, res, next) => {
 
     Put the decoded token in the req object, to make life easier for middlewares downstream!
   */
+    const token = req.headers.authorization
+
+    if (!token) {
+      res.status(401).json({ message: 'you shall not pass' })
+    } else {
+      jwt.verify(token, jwtSecret, (err, decoded) => {
+        if (err) {
+          res.status(401).json({ message: 'token bad' })
+        } else {
+          req.decodedJwt = decoded
+          next()
+        }
+      })
+    }
 }
 
 const only = role_name => (req, res, next) => {
